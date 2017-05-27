@@ -14,6 +14,7 @@ class Movies(models.Model):
 
 class Users(models.Model):
     userId = models.IntegerField(default = 0,unique=True)
+    userName = models.CharField(max_length=200)
 
 class CSVRatings(models.Model):
     userId = models.ForeignKey(Users, to_field="userId", db_column="userId")
@@ -25,8 +26,8 @@ class Results(models.Model):
     users = models.ForeignKey(Users, to_field="userId", db_column="userId")
     movies = models.ForeignKey(Movies, to_field="movieId", db_column="movieId")
     estimate = models.FloatField(default = 0.0)
-    
-class Features(models.Model):
+
+class MovieFeatures(models.Model):
     Name = models.CharField(max_length=200)
     Director = models.CharField(max_length=200)
     Production = models.CharField(max_length=200)
@@ -41,4 +42,3 @@ class Features(models.Model):
     Genre1 = models.CharField(max_length=200)
     Genre2 = models.CharField(max_length=200)
     Genre3 = models.CharField(max_length=200)
-    
