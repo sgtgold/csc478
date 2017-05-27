@@ -21,3 +21,5 @@ urlpatterns = [
     url(r'^movies/', include('movies.urls')),
     url(r'^ratings/', include('star_ratings.urls', namespace='ratings', app_name='ratings')),
 ]
+
+
