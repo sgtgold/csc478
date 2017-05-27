@@ -5,7 +5,7 @@
 {% if movie_list %}
     <select>
     {% for u in user_list  %}
-        <option><a href="/movies/{{ u.id }}/">{{ u.userid }}</a></option>
+        <option><a href="/movies/{{ u.id }}/">{{ u.userId }}</a></option>
     {% endfor %}
     <select/>
         {% else %}

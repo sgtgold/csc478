@@ -25,4 +25,3 @@ class Results(models.Model):
     users = models.ForeignKey(Users, to_field="userId", db_column="userId")
     movies = models.ForeignKey(Movies, to_field="movieId", db_column="movieId")
     estimate = models.FloatField(default = 0.0)
-    

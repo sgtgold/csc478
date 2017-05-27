@@ -1,12 +1,12 @@
 from django.http import HttpResponse
 from django.template import loader
-from .models import Movies,Users
+from .models import Movies,Users,CSVRatings
 from star_ratings.models import Rating
 
 
 def index(request):
-    user_list = list(set(Users.objects.all()))
-    movie_list = Movies.objects.filter(users__userid=1)
+    user_list = Users.objects.all()
+    movie_list = CSVRatings.objects.filter(userId__userId=1)
 
     #ratings_list = user_list
     template = loader.get_template('movies/admin.html')
