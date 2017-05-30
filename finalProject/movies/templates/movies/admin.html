@@ -1,26 +1,48 @@
-{% load static %}
 <html>
-<link rel="stylesheet" href="{% static 'star-ratings/css/star-ratings.css' %}">
-<script type="text/javascript" src="{% static 'star-ratings/js/dist/star-ratings.min.js' %}"></script>
-{% if movie_list %}
-    <select>
-    {% for u in user_list  %}
-        <option><a href="/movies/{{ u.id }}/">{{ u.userId }}</a></option>
-    {% endfor %}
-    <select/>
-        {% else %}
-            <p>No movies are available.</p>
-        {% endif %}
+<head>
+<style>
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 15px;
+}
+</style>
+    <h1>Application Performance Monitor</h1>
+</head>
+
+  <table>
+      <tr>
+        <th>Number of Users</th>
+        <th>Number of Movies</th>
+          <th>Average Movies seen per User</th>
+            <th>Average Rating</th>
+          <th>New Users since launch</th>
+      </tr>
+      <tr>
+          {% for summary in summaryList %}
+                <td>{{ summary.numUsers }}</td>
+        <td>{{ summary.numMovies }}</td>
+          <td>{{ summary.avgMovies }}</td>
+          <td>{{ summary.avgRating }}</td>
+          <td>-1</td>
+          {% endfor %}
+      </tr>
+    </table>
+  <br/>
+  <br/>
+    <table>
+      <tr>
+        <th>RMSE</th>
+        <th>Precision</th>
+          <th>Recall</th>
+      </tr>
+      <tr>
+        <td>-1</td>
+        <td>-1</td>
+          <td>-1</td>
+      </tr>
+    </table>
+    <img src="/movies/charts/histRated.png"/>
 </html>
-    <!--<select>
-    {% for m in movie_list  %}
-        <option><a href="/movies/{{ m.id }}/">{{ m.title }}</a></option>
-    {% endfor %}
-    <select/>
-        {% load ratings %}
-        {% for r in ratings_list %}
-           {% ratings r %}
-        {% endfor %}
-     -->
-
-
