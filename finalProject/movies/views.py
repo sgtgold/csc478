@@ -1,8 +1,9 @@
-from django.http import HttpResponse
-from django.template import loader
+from django.http import HttpResponseRedirect,HttpResponse
+from django.template import loader,RequestContext
 from .models import Movies,Users,CSVRatings,MovieFeatures
-from star_ratings.models import Rating
 from django.shortcuts import render
+from django.core.urlresolvers import reverse
+
 
 from .forms import UserForm
 
@@ -14,15 +15,39 @@ def get_name(request):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            # ...
+            user,created = Users.objects.get_or_create(userName=form.cleaned_data['user_name'])
             # redirect to a new URL:
-            return HttpResponseRedirect('/thanks/')
+            print 'User to be passed:',user
+            url = reverse('newUserMovieListForm', kwargs={'id': user.id})
+            return HttpResponseRedirect(url)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UserForm()
 
     return render(request, 'movies/newuser.html', {'form': form})
+
+
+def new_user_movies(request, id):
+    template = loader.get_template('movies/initialpicks.html')
+    movies_list_1 = Movies.objects.all().order_by('title')
+    movies_list_2 = Movies.objects.all().order_by('title')
+    movies_list_3 = Movies.objects.all().order_by('title')
+    context = {
+        'movie_list_1': movies_list_1,
+        'movie_list_2': movies_list_2,
+        'movie_list_3': movies_list_3,
+    }
+    if request.method == 'POST':
+        print request.POST
+        userid = id
+        CSVRatings.objects.get_or_create(user=Users.objects.get(id=userid),movies=Movies.objects.get(movieId=request.POST['movie1']),rating=request.POST['rating1'])
+        CSVRatings.objects.get_or_create(user=Users.objects.get(id=userid), movies=Movies.objects.get(movieId=request.POST['movie2']),rating=request.POST['rating2'])
+        CSVRatings.objects.get_or_create(user=Users.objects.get(id=userid), movies=Movies.objects.get(movieId=request.POST['movie3']),rating=request.POST['rating3'])
+    else:
+        print "Load"
+    return HttpResponse(template.render(context, request))
+
 
 def admin(request):
     user_list = Users.objects.all()

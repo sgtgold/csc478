@@ -13,17 +13,17 @@ class Movies(models.Model):
         ordering = ['title']
 
 class Users(models.Model):
-    userId = models.IntegerField(default = 0,unique=True)
     userName = models.CharField(max_length=200)
+    timestamp = models.DateTimeField(auto_now_add=True, blank=True)
 
 class CSVRatings(models.Model):
-    userId = models.ForeignKey(Users, to_field="userId", db_column="userId")
+    user = models.ForeignKey(Users)
     movies = models.ForeignKey(Movies, to_field="movieId", db_column="movieId")
     rating = models.FloatField(default = 0.0)
     timestamp = models.DateTimeField(auto_now_add=True, blank=True)
 
 class Results(models.Model):
-    users = models.ForeignKey(Users, to_field="userId", db_column="userId")
+    users = models.ForeignKey(Users)
     movies = models.ForeignKey(Movies, to_field="movieId", db_column="movieId")
     estimate = models.FloatField(default = 0.0)
 
