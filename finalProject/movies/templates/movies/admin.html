@@ -35,13 +35,13 @@ th, td {
     <table>
       <tr>
         <th>RMSE</th>
-        <th>Precision</th>
-          <th>Recall</th>
+        <th>MAE</th>
       </tr>
       <tr>
-        <td>-1</td>
-        <td>-1</td>
-          <td>-1</td>
+          {% for summary in summaryList %}
+        <td>{{ summary.RMSE }}</td>
+        <td>{{ summary.MAE }}</td>
+          {% endfor %}
       </tr>
     </table>
     <img src="/movies/charts/histRated.png"/>
