@@ -49,7 +49,7 @@ def newUserRating(data, newuid, algo, movie):
     movieId = movie.movieId
     movieId = list(movieId)
     for i in movieId:
-        pred = algo.predict(newuid, i, r_ui=5, verbose=True)
+        pred = algo.predict(newuid, i, r_ui=5, verbose=False)
         rating.update({i: pred.est})
     sorted_rating = sorted(rating.items(), key=operator.itemgetter(1))
     sorted_rating.reverse()
