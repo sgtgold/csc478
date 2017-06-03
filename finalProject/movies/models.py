@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from django.db import models
-from django_pandas.io import read_frame
 
 
 class Movies(models.Model):
