@@ -62,3 +62,12 @@ def newUserRating(data, newuid, algo, movie):
     ratings = np.array(sorted_rating[0:5])
     result = pd.DataFrame(ratings, columns=['movie_id', 'Estimate Rating'])
     return result
+
+##Return the mean MAE and RMSE for CV results
+def meanMetricsCV(algo,fold,data):
+    data.split(n_folds=fold)
+    algorithm=algo()
+    perfsvd=evaluate(algorithm, data, measures=['RMSE', 'MAE'])
+    MAE=sum(perfsvd['mae'])/fold
+    RMSE=sum(perfsvd['RMSE'])/fold
+    return MAE,RMSE
