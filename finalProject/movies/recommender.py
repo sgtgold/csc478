@@ -67,7 +67,7 @@ def newUserRating(data, newuid, algo, movie):
 def meanMetricsCV(algo,fold,data):
     data.split(n_folds=fold)
     algorithm=algo()
-    perfsvd=evaluate(algorithm, data, measures=['RMSE', 'MAE'])
+    perfsvd=evaluate(algorithm, data, measures=['RMSE', 'MAE'],verbose=False)
     MAE=sum(perfsvd['mae'])/fold
     RMSE=sum(perfsvd['RMSE'])/fold
     return MAE,RMSE
