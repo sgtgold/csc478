@@ -56,8 +56,10 @@ def new_user_movies(request, id):
 
 
 class MovieRecs:
-    title =''
-    pred_rating = 0.0
+    def __init__(self,rank, title,pred_rating):
+        self.rank = rank
+        self.title = title
+        self.pred_rating = pred_rating
 
 def recommend_movies(request,id):
     from surprise import SVD
@@ -81,18 +83,17 @@ def recommend_movies(request,id):
 
 
     data = pdtoData(ratings)
-    result = newUserRating(data, 672, SVD(), movie_df)
+    result = newUserRating(data, float(id), SVD(), movie_df)
 
 
-
+    print result
 
     m_list = []
-    for r in result:
-        print Movies.objects.get(movieId=r['movie_id'])
-        MovieRecs.title = ''
-        MovieRecs.pred_rating = r['Estimate Rating']
-        m_list.append(MovieRecs)
-    #print sortednewrating[:5]
+    for index,row in result.iterrows():
+        print row
+        movie = Movies.objects.get(movieId=int(row['movie_id']))
+        m = MovieRecs(rank=index+1,title= movie.title,pred_rating = row['Estimate Rating'])
+        m_list.append(m)
     context = {
         'movie_list':m_list
     }

@@ -10,14 +10,31 @@
             text-decoration: none;
             color: initial;
         }
+        table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 15px;
+    }
     </style>
 </header>
 {% if movie_list %}
-    <ol>
+<table>
+<tr>
+    <th>Rank</th>
+    <th>Title</th>
+    <th>Estimated Rating</th>
+</tr>
     {% for m in movie_list  %}
-        <li>{{ m.title }} : {{m.pred_rating}}</li>
+    <tr>
+        <td>{{m.rank}}</td>
+        <td>{{ m.title }}</td>
+        <td>{{m.pred_rating}}</td>
+    </tr>
     {% endfor %}
-    </ol>
+
+    </table>
     {% else %}
         <p>No movies are available.</p>
     {% endif %}
