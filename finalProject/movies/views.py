@@ -152,6 +152,81 @@ def histRated(request):
     canvas.print_png(response)
     return response
 
+def histGenre1(request):
+
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    from matplotlib.figure import Figure
+    import pandas as pd
+    import numpy as np
+
+    fig = Figure()
+    rdf = pd.Series(MovieFeatures.objects.filter(Genre1__in=['Action','Adventure','Animation','Biography','Comedy','Crime','Documentary','Drama','Family','Fantasy','Film-Noir','Horror','Music','Musical','Mystery','Romance','Sci-Fi','Short','Thriller','War','Western']).values().values_list('Genre1', flat=True))
+    ax = fig.add_subplot(111)
+    labels = ['Action','Adventure','Animation','Biography','Comedy','Crime','Documentary','Drama','Family','Fantasy','Film-Noir','Horror','Music','Musical','Mystery','Romance','Sci-Fi','Short','Thriller','War','Western']
+    gData = np.array(rdf.value_counts())#.plot(kind='bar')
+    print gData
+
+    ax.bar(left=np.array([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]),height=gData)
+    ax.set_xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,20,21])
+
+    ax.set_title('Count of Movies by Genre')
+    ax.set_ylabel('Genre Count')
+    ax.set_xlabel('Genre')
+
+    ax.set_xticklabels(labels,rotation=90)
+    canvas = FigureCanvas(fig)
+    response = HttpResponse(content_type='image/png')
+    canvas.print_png(response)
+    return response
+
+def histProd(request):
+
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    from matplotlib.figure import Figure
+    import numpy as np
+    fig = Figure()
+    rdf = pd.Series(MovieFeatures.objects.filter(Production__in=['Sony Pictures','Universal Pictures','Paramount Pictures','20th Century Fox','Warner Bros.']).values().values_list('Production', flat=True))
+
+    ax = fig.add_subplot(111)
+    labels = ['Sony Pictures','Universal Pictures','Paramount Pictures','20th Century Fox','Warner Bros.']
+    gData = np.array(rdf.value_counts())#.plot(kind='bar')
+
+    ax.bar(left=np.array([0,1,2,3,4]),height=gData)
+    ax.set_xticks([0,1,2,3,4,5])
+    ax.set_title('Count of Movies by Major Production Companies')
+    ax.set_ylabel('Movie Count')
+    ax.set_xlabel('Production Companies')
+
+    ax.set_xticklabels(labels, rotation=45)
+    canvas = FigureCanvas(fig)
+    response = HttpResponse(content_type='image/png')
+    canvas.print_png(response)
+    return response
+
+def histYear(request):
+
+    from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+    from matplotlib.figure import Figure
+    import numpy as np
+    fig = Figure()
+    rdf = pd.Series(MovieFeatures.objects.filter(Year__in=['2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017']).values().values_list('Year', flat=True))
+
+    ax = fig.add_subplot(111)
+    labels = ['2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011','2012','2013','2014','2015','2016','2017']
+    gData = np.array(rdf.value_counts())#.plot(kind='bar')
+    
+    ax.bar(left=np.array([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]),height=gData)
+    ax.set_xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17])
+    ax.set_title('Count of Movies by Year (21st Century)')
+    ax.set_ylabel('Movie Count')
+    ax.set_xlabel('Year')
+
+    ax.set_xticklabels(labels, rotation=45)
+    canvas = FigureCanvas(fig)
+    response = HttpResponse(content_type='image/png')
+    canvas.print_png(response)
+    return response
+
 #Template
 def simple(request):
     import random
