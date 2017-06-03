@@ -17,20 +17,48 @@ def get_name(request):
         # check whether it's valid:
         if form.is_valid():
             # process the data in form.cleaned_data as required
-            user,created = Users.objects.get_or_create(userName=form.cleaned_data['user_name'])
+            _user,created = Users.objects.get_or_create(userName=form.cleaned_data['user_name'])
             # redirect to a new URL:
-            print 'User to be passed:',user
-            url = reverse('newUserMovieListForm', kwargs={'id': user.id})
+            print created
+            if created:
+                print 'New User'
+                url = reverse('UserMovieListForm', kwargs={'id': _user.id})
+            else:
+
+                ratings = CSVRatings.objects.all().filter(user=_user)
+                if len(ratings) >= 3:
+                    print 'Existing User'
+                    url = reverse('recommendations', kwargs={'id': _user.id})
+                else:
+                    url = reverse('UserMovieListForm', kwargs={'id': _user.id})
             return HttpResponseRedirect(url)
 
     # if a GET (or any other method) we'll create a blank form
     else:
         form = UserForm()
 
-    return render(request, 'movies/newuser.html', {'form': form})
+    return render(request, 'movies/user.html', {'form': form})
+
+def add_movie(request,id):
+    template = loader.get_template('movies/addmovie.html')
+    movies_list_1 = Movies.objects.all().order_by('title')
+    context = {
+        'movie_list_1': movies_list_1,
+    }
+    if request.method == 'POST':
+        template = loader.get_template('movies/recommendations.html')
+        userid = id
+        _user = Users.objects.get(id=userid)
+        print 'User to be passed:', _user
+        url = reverse('recommendations', kwargs={'id': _user.id})
+        return HttpResponseRedirect(url)
+    else:
+        print "Load"
+    return HttpResponse(template.render(context, request))
 
 
-def new_user_movies(request, id):
+
+def user_movies(request, id):
     template = loader.get_template('movies/initialpicks.html')
     movies_list_1 = Movies.objects.all().order_by('title')
     movies_list_2 = Movies.objects.all().order_by('title')
@@ -41,15 +69,30 @@ def new_user_movies(request, id):
         'movie_list_3': movies_list_3,
     }
     if request.method == 'POST':
-        template = loader.get_template('movies/recommendations.html')
+
         userid = id
         _user = Users.objects.get(id=userid)
-        CSVRatings.objects.get_or_create(user=_user,movies=Movies.objects.get(movieId=request.POST['movie1']),rating=request.POST['rating1'])
-        CSVRatings.objects.get_or_create(user=_user, movies=Movies.objects.get(movieId=request.POST['movie2']),rating=request.POST['rating2'])
-        CSVRatings.objects.get_or_create(user=_user, movies=Movies.objects.get(movieId=request.POST['movie3']),rating=request.POST['rating3'])
-        print 'User to be passed:', _user
-        url = reverse('recommendations', kwargs={'id': _user.id})
-        return HttpResponseRedirect(url)
+        m1 = request.POST['movie1']
+        m2 = request.POST['movie2']
+        m3 = request.POST['movie3']
+        #Non-Valid Post
+        if(m1 == m2 or m1 == m3 or m2 == m3):
+            context = {
+                'movie_list_1': movies_list_1,
+                'movie_list_2': movies_list_2,
+                'movie_list_3': movies_list_3,
+                'error_message' : 'No duplicate movies allowed',
+            }
+            return HttpResponse(template.render(context, request))
+        else:
+            template = loader.get_template('movies/recommendations.html')
+            #Submit new ratings
+            CSVRatings.objects.get_or_create(user=_user,movies=Movies.objects.get(movieId=m1),rating=request.POST['rating1'])
+            CSVRatings.objects.get_or_create(user=_user, movies=Movies.objects.get(movieId=m2),rating=request.POST['rating2'])
+            CSVRatings.objects.get_or_create(user=_user, movies=Movies.objects.get(movieId=m3),rating=request.POST['rating3'])
+            print 'User to be passed:', _user
+            url = reverse('recommendations', kwargs={'id': _user.id})
+            return HttpResponseRedirect(url)
     else:
         print "Load"
     return HttpResponse(template.render(context, request))
@@ -62,41 +105,40 @@ class MovieRecs:
         self.pred_rating = pred_rating
 
 def recommend_movies(request,id):
+    if request.method == 'GET':
+        template = loader.get_template('movies/recommendations.html')
+        #ratings = pd.DataFrame(CSVRatings.objects.all().values_list('movies_id','user_id','rating'))
+        ratings = pd.DataFrame(list(CSVRatings.objects.all().values()))
+        ratings = ratings.drop('id',1)
+        ratings = ratings[['user_id','movies_id','rating','timestamp']]
+        ratings['u'] = ratings['user_id']
+        ratings['i'] = ratings['movies_id']
+        ratings['r'] = ratings['rating']
+        ratings['t'] = ratings['timestamp']
 
-    template = loader.get_template('movies/recommendations.html')
-    #ratings = pd.DataFrame(CSVRatings.objects.all().values_list('movies_id','user_id','rating'))
-    ratings = pd.DataFrame(list(CSVRatings.objects.all().values()))
-    ratings = ratings.drop('id',1)
-    ratings = ratings[['user_id','movies_id','rating','timestamp']]
-    ratings['u'] = ratings['user_id']
-    ratings['i'] = ratings['movies_id']
-    ratings['r'] = ratings['rating']
-    ratings['t'] = ratings['timestamp']
+        ratings = ratings.drop('user_id',1)
+        ratings = ratings.drop('movies_id', 1)
+        ratings = ratings.drop('rating', 1)
+        ratings = ratings.drop('timestamp', 1)
 
-    ratings = ratings.drop('user_id',1)
-    ratings = ratings.drop('movies_id', 1)
-    ratings = ratings.drop('rating', 1)
-    ratings = ratings.drop('timestamp', 1)
+        movies_list = Movies.objects.all()
+        movie_df = pd.DataFrame(list(Movies.objects.values_list('movieId',flat=True)),columns=['movieId'])
 
-    movies_list = Movies.objects.all()
-    movie_df = pd.DataFrame(list(Movies.objects.values_list('movieId',flat=True)),columns=['movieId'])
+        data = pdtoData(ratings)
+        result = newUserRating(data, float(id), SVD(), movie_df)
 
-
-    data = pdtoData(ratings)
-    result = newUserRating(data, float(id), SVD(), movie_df)
-
-
-    print result
-
-    m_list = []
-    for index,row in result.iterrows():
-        print row
-        movie = Movies.objects.get(movieId=int(row['movie_id']))
-        m = MovieRecs(rank=index+1,title= movie.title,pred_rating = row['Estimate Rating'])
-        m_list.append(m)
-    context = {
-        'movie_list':m_list
-    }
+        m_list = []
+        for index,row in result.iterrows():
+            print row
+            movie = Movies.objects.get(movieId=int(row['movie_id']))
+            m = MovieRecs(rank=index+1,title= movie.title,pred_rating = row['Estimate Rating'])
+            m_list.append(m)
+        context = {
+            'movie_list':m_list
+        }
+    if request.method == 'POST':
+        url = reverse('addMovieForm', kwargs={'id': id})
+        return HttpResponseRedirect(url)
     return HttpResponse(template.render(context, request))
 
 def admin(request):

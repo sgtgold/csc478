@@ -1,0 +1,11 @@
+<html>
+<h2>Enter in a User Name</h2>
+<h2>Existing users will be logged in (if you have rated at least 3 movies)</h2>
+<h2>New users will be prompted for some movie ratings.</h2>
+<h2></h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="OK">
+    </form>
+</html>

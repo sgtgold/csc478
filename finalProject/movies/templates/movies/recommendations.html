@@ -39,5 +39,9 @@
         <p>No movies are available.</p>
     {% endif %}
 <h2>Rate a new movie to update your recomendations</h2>
-<a href="http://google.com" class="button">Rate a new movie</a>
+<form action="" method="post">
+    {% csrf_token %}
+     <input type="submit" value="Select">
+</form>
+<a href="/movies/user.html" class="button">Start as different User</a>
 </html>

@@ -1,36 +1,13 @@
 <html>
 
-<header>
+<head>
     <h1>Pick three movies you have seen and rate them on a scale of 1 - 5 </h1>
     <style>
     </style>
-    <script type="text/javascript">
-    function ddValidate() {
-        var m1 = document.getElementById("movie1");
-        var m2 = document.getElementById("movie2");
-        var m3 = document.getElementById("movie3");
-        if (m1.selectedIndex == m2.selectedIndex) {
-            alert("Movies 1 and 2 are the same");
-            event.preventDefault();
-        }
-        else if (m1.selectedIndex == m3.selectedIndex) {
-            alert("Movies 1 and 3 are the same");
-            event.preventDefault();
-        }
-        else if (m2.selectedIndex == m3.selectedIndex) {
-            alert("Movies 2 and 3 are the same");
-            event.preventDefault();
-        }
-        else
-        {
-          $('form').append('<input type="hidden" id="movie1" name="movie1" value="'+ m1.options[m1.selectedIndex].value +'"/>');
-          $('form').append('<input type="hidden" id="movie2" name="movie2" value="'+ m2.options[m2.selectedIndex].value +'"/>');
-          $('form').append('<input type="hidden" id="movie3" name="movie3" value="'+ m3.options[m3.selectedIndex].value +'"/>');
-        }
-    }
-</script>
-</header>
+
+</head>
 <body>
+<h2 color="red">{{ error_message }}</h2>
 <form action="" method="post">
     {% csrf_token %}
     <select name="movie1">
@@ -61,7 +38,7 @@
                            <br/>
         <br/>
         <br/>
-  <input type="submit" value="Select" onclick="ddValidate();">
+  <input type="submit" value="Select" onsubmit="event.preventDefault(); ddValidate();">
 </form>
 </body>
 

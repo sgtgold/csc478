@@ -1,28 +1,7 @@
 <html>
 
 <header>
-    <h1>Pick three movies you have seen and rate them on a scale of 1 - 5 </h1>
-    <style>
-    </style>
-    <script type="text/javascript">
-    function ddValidate() {
-        var m1 = document.getElementById("movie1");
-        var m2 = document.getElementById("movie2");
-        var m3 = document.getElementById("movie3");
-        if (m1.selectedIndex == m2.selectedIndex) {
-            alert("Movies 1 and 2 are the same");
-            event.preventDefault();
-        }
-        else if (m1.selectedIndex == m3.selectedIndex) {
-            alert("Movies 1 and 3 are the same");
-            event.preventDefault();
-        }
-        else if (m2.selectedIndex == m3.selectedIndex) {
-            alert("Movies 2 and 3 are the same");
-            event.preventDefault();
-        }
-    }
-</script>
+    <h1>Welcome Back: Pick a movie you want to rate </h1>
 </header>
 <body>
 <form action="" method="post">
@@ -34,28 +13,7 @@
     </select>
         <input type="text" name="rating1" pattern="[1-5]" title="Please type a number 1-5" required=True />
         <br/>
-        <br/>
-        <br/>
-           <select name="movie2">
-    {% for m in movie_list_2  %}
-        <option value="{{m.movieId}}">{{ m.title  }}</option>
-    {% endfor %}
-    </select>
-        <input type="text" name="rating2" pattern="[1-5]" title="Please type a number 1-5" required=True />
-        <br/>
-        <br/>
-        <br/>
-               <select name="movie3">
-    {% for m in movie_list_3  %}
-        <option value={{"m.movieId"}}>{{ m.title  }}</option>
-    {% endfor %}
-
-    </select>
-                   <input type="text" name="rating3" pattern="[1-5]" title="Please type a number 1-5" required=True />
-                           <br/>
-        <br/>
-        <br/>
-  <input type="submit" value="Select" onclick="ddValidate();">
+  <input type="submit" value="Select">
 </form>
 </body>
 
