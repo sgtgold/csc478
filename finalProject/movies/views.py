@@ -3,6 +3,8 @@ from django.template import loader,RequestContext
 from .models import Movies,Users,CSVRatings,MovieFeatures
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
+from .recommender import newUserRating,pdtoData
+import pandas as pd
 
 
 from .forms import UserForm
@@ -39,15 +41,62 @@ def new_user_movies(request, id):
         'movie_list_3': movies_list_3,
     }
     if request.method == 'POST':
-        print request.POST
+        template = loader.get_template('movies/recommendations.html')
         userid = id
-        CSVRatings.objects.get_or_create(user=Users.objects.get(id=userid),movies=Movies.objects.get(movieId=request.POST['movie1']),rating=request.POST['rating1'])
-        CSVRatings.objects.get_or_create(user=Users.objects.get(id=userid), movies=Movies.objects.get(movieId=request.POST['movie2']),rating=request.POST['rating2'])
-        CSVRatings.objects.get_or_create(user=Users.objects.get(id=userid), movies=Movies.objects.get(movieId=request.POST['movie3']),rating=request.POST['rating3'])
+        _user = Users.objects.get(id=userid)
+        CSVRatings.objects.get_or_create(user=_user,movies=Movies.objects.get(movieId=request.POST['movie1']),rating=request.POST['rating1'])
+        CSVRatings.objects.get_or_create(user=_user, movies=Movies.objects.get(movieId=request.POST['movie2']),rating=request.POST['rating2'])
+        CSVRatings.objects.get_or_create(user=_user, movies=Movies.objects.get(movieId=request.POST['movie3']),rating=request.POST['rating3'])
+        print 'User to be passed:', _user
+        url = reverse('recommendations', kwargs={'id': _user.id})
+        return HttpResponseRedirect(url)
     else:
         print "Load"
     return HttpResponse(template.render(context, request))
 
+
+class MovieRecs:
+    title =''
+    pred_rating = 0.0
+
+def recommend_movies(request,id):
+    from surprise import SVD
+    template = loader.get_template('movies/recommendations.html')
+    #ratings = pd.DataFrame(CSVRatings.objects.all().values_list('movies_id','user_id','rating'))
+    ratings = pd.DataFrame(list(CSVRatings.objects.all().values()))
+    ratings = ratings.drop('id',1)
+    ratings = ratings[['user_id','movies_id','rating','timestamp']]
+    ratings['u'] = ratings['user_id']
+    ratings['i'] = ratings['movies_id']
+    ratings['r'] = ratings['rating']
+    ratings['t'] = ratings['timestamp']
+
+    ratings = ratings.drop('user_id',1)
+    ratings = ratings.drop('movies_id', 1)
+    ratings = ratings.drop('rating', 1)
+    ratings = ratings.drop('timestamp', 1)
+
+    movies_list = Movies.objects.all()
+    movie_df = pd.DataFrame(list(Movies.objects.values_list('movieId',flat=True)),columns=['movieId'])
+
+
+    data = pdtoData(ratings)
+    result = newUserRating(data, 672, SVD(), movie_df)
+
+
+
+
+    m_list = []
+    for r in result:
+        print Movies.objects.get(movieId=r['movie_id'])
+        MovieRecs.title = ''
+        MovieRecs.pred_rating = r['Estimate Rating']
+        m_list.append(MovieRecs)
+    #print sortednewrating[:5]
+    context = {
+        'movie_list':m_list
+    }
+    return HttpResponse(template.render(context, request))
 
 def admin(request):
     user_list = Users.objects.all()
@@ -67,6 +116,7 @@ def admin(request):
         'summaryList':summaryList,
     }
     return HttpResponse(template.render(context, request))
+
 def index(request):
     template = loader.get_template('movies/index.html')
     context = {
@@ -79,7 +129,6 @@ def histRated(request):
 
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
     from matplotlib.figure import Figure
-    import pandas as pd
     import numpy as np
 
     fig = Figure()
