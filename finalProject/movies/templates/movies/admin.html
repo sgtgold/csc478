@@ -32,16 +32,19 @@ th, td {
     </table>
   <br/>
   <br/>
+</style>
+    <h1>5-Fold Cross-Validation Results for Mean RMSE and MAE of SVD Model</h1>
+</head>
     <table>
       <tr>
         <th>RMSE</th>
-        <th>Precision</th>
-          <th>Recall</th>
+        <th>MAE</th>
       </tr>
       <tr>
-        <td>-1</td>
-        <td>-1</td>
-          <td>-1</td>
+          {% for summary in summaryList %}
+        <td>{{ summary.RMSE }}</td>
+        <td>{{ summary.MAE }}</td>
+          {% endfor %}
       </tr>
     </table>
     <img src="/movies/charts/histRated.png"/>

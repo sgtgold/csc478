@@ -3,9 +3,9 @@ from django.template import loader,RequestContext
 from .models import Movies,Users,CSVRatings,MovieFeatures
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
-from .recommender import newUserRating,pdtoData
+from .recommender import newUserRating,pdtoData,meanMetricsCV
 import pandas as pd
-
+from surprise import SVD
 
 from .forms import UserForm
 
@@ -62,7 +62,7 @@ class MovieRecs:
         self.pred_rating = pred_rating
 
 def recommend_movies(request,id):
-    from surprise import SVD
+
     template = loader.get_template('movies/recommendations.html')
     #ratings = pd.DataFrame(CSVRatings.objects.all().values_list('movies_id','user_id','rating'))
     ratings = pd.DataFrame(list(CSVRatings.objects.all().values()))
@@ -107,10 +107,30 @@ def admin(request):
     template = loader.get_template('movies/admin.html')
     summaryList = []
 
+    ratings = pd.DataFrame(list(CSVRatings.objects.all().values()))
+    ratings = ratings.drop('id', 1)
+    ratings = ratings[['user_id', 'movies_id', 'rating', 'timestamp']]
+    ratings['u'] = ratings['user_id']
+    ratings['i'] = ratings['movies_id']
+    ratings['r'] = ratings['rating']
+    ratings['t'] = ratings['timestamp']
+
+    ratings = ratings.drop('user_id', 1)
+    ratings = ratings.drop('movies_id', 1)
+    ratings = ratings.drop('rating', 1)
+    ratings = ratings.drop('timestamp', 1)
+
+    movies_list = Movies.objects.all()
+    movie_df = pd.DataFrame(list(Movies.objects.values_list('movieId', flat=True)), columns=['movieId'])
+
+    data = pdtoData(ratings)
+
     summary.numUsers = len(user_list)
     summary.numMovies = len(movies_list)
     summary.avgMovies = len(csvmovies_list)/summary.numUsers
     summary.avgRating = sum(ratings_list)/len(ratings_list)
+    movie_df = pd.DataFrame(list(csvmovies_list), columns=['movieId'])
+    summary.MAE,summary.RMSE=meanMetricsCV(SVD,5,data)
 
     summaryList.append(summary)
     context = {
