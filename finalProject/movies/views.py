@@ -9,6 +9,11 @@ from surprise import SVD
 
 from .forms import UserForm
 
+
+#Our user login page
+#Existing users will go to their recommendations
+#New Users will be sent to make their initial picks
+#Ties to user.html template
 def get_name(request):
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
@@ -26,6 +31,7 @@ def get_name(request):
             else:
 
                 ratings = CSVRatings.objects.all().filter(user=_user)
+                #Protect against bad work flow, by making sure they have 3 ratings
                 if len(ratings) >= 3:
                     print 'Existing User'
                     url = reverse('recommendations', kwargs={'id': _user.id})
@@ -39,6 +45,9 @@ def get_name(request):
 
     return render(request, 'movies/user.html', {'form': form})
 
+#Allows an existing user to add a new movie
+#Takes in a user id as a parameter
+#Ties to addmovie.html template
 def add_movie(request,id):
     template = loader.get_template('movies/addmovie.html')
     movies_list_1 = Movies.objects.all().order_by('title')
@@ -57,7 +66,8 @@ def add_movie(request,id):
     return HttpResponse(template.render(context, request))
 
 
-
+#Allows a new user to make their first 3 movies
+#Also checks for duplicate messages
 def user_movies(request, id):
     template = loader.get_template('movies/initialpicks.html')
     movies_list_1 = Movies.objects.all().order_by('title')
@@ -84,6 +94,7 @@ def user_movies(request, id):
                 'error_message' : 'No duplicate movies allowed',
             }
             return HttpResponse(template.render(context, request))
+        #Valid post, go to recommendations
         else:
             template = loader.get_template('movies/recommendations.html')
             #Submit new ratings
@@ -97,17 +108,20 @@ def user_movies(request, id):
         print "Load"
     return HttpResponse(template.render(context, request))
 
-
+#Class to display recommendations
 class MovieRecs:
     def __init__(self,rank, title,pred_rating):
         self.rank = rank
         self.title = title
         self.pred_rating = pred_rating
 
+
+#Calls the actual recommender engine
+#Tied to recommendations.html
 def recommend_movies(request,id):
     if request.method == 'GET':
         template = loader.get_template('movies/recommendations.html')
-        #ratings = pd.DataFrame(CSVRatings.objects.all().values_list('movies_id','user_id','rating'))
+        #Format our SQLite data for consumption by the Surprise engine
         ratings = pd.DataFrame(list(CSVRatings.objects.all().values()))
         ratings = ratings.drop('id',1)
         ratings = ratings[['user_id','movies_id','rating','timestamp']]
@@ -120,13 +134,14 @@ def recommend_movies(request,id):
         ratings = ratings.drop('movies_id', 1)
         ratings = ratings.drop('rating', 1)
         ratings = ratings.drop('timestamp', 1)
-
+        #loop through all our movies
         movies_list = Movies.objects.all()
         movie_df = pd.DataFrame(list(Movies.objects.values_list('movieId',flat=True)),columns=['movieId'])
 
         data = pdtoData(ratings)
+        #Get our recommeders
         result = newUserRating(data, float(id), SVD(), movie_df)
-
+        #Bind our results to the template context
         m_list = []
         for index,row in result.iterrows():
             print row
@@ -141,6 +156,9 @@ def recommend_movies(request,id):
         return HttpResponseRedirect(url)
     return HttpResponse(template.render(context, request))
 
+
+#Calculate our admin page statistics
+#ties to movies/admin.html
 def admin(request):
     user_list = Users.objects.all()
     movies_list = Movies.objects.all()
@@ -173,16 +191,15 @@ def admin(request):
     summary.avgRating = sum(ratings_list)/len(ratings_list)
     summary.newUser=max(ratings['u'])-671
     movie_df = pd.DataFrame(list(csvmovies_list), columns=['movieId'])
-    #summary.MAE,summary.RMSE=meanMetricsCV(SVD,5,data)
-    summary.MAE=0.690496627721
-    summary.RMSE=0.898839313311
+    #print our Cross Validation 5 MAE and RMSE
+    summary.MAE,summary.RMSE=meanMetricsCV(SVD,5,data)
 
     summaryList.append(summary)
     context = {
         'summaryList':summaryList,
     }
     return HttpResponse(template.render(context, request))
-
+#template request
 def index(request):
     template = loader.get_template('movies/index.html')
     context = {
@@ -191,6 +208,7 @@ def index(request):
     return HttpResponse(template.render(context, request))
 
 #Number of Movies by Length
+#Displayed on the admin page
 def histRated(request):
 
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -216,7 +234,8 @@ def histRated(request):
     response = HttpResponse(content_type='image/png')
     canvas.print_png(response)
     return response
-
+#Movies by genre
+#Displayed on the admin page
 def histGenre1(request):
 
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -243,7 +262,8 @@ def histGenre1(request):
     response = HttpResponse(content_type='image/png')
     canvas.print_png(response)
     return response
-
+#Movies by producer
+#Displayed on the admin page
 def histProd(request):
 
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -268,6 +288,8 @@ def histProd(request):
     canvas.print_png(response)
     return response
 
+#Movies by year
+#Displayed on the admin page
 def histYear(request):
 
     from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
@@ -292,7 +314,7 @@ def histYear(request):
     canvas.print_png(response)
     return response
 
-#Template
+#Template for graphs
 def simple(request):
     import random
     import datetime
