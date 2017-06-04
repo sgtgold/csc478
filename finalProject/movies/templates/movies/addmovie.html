@@ -1,20 +1,83 @@
+
+
+
+{% load staticfiles %}
 <html>
 
-<header>
-    <h1>Welcome Back: Pick a movie you want to rate </h1>
-</header>
-<body>
-<form action="" method="post">
-    {% csrf_token %}
-    <select name="movie1">
-    {% for m in movie_list_1  %}
-        <option value="{{m.movieId}}">{{ m.title  }}</option>
-    {% endfor %}
-    </select>
-        <input type="text" name="rating1" pattern="[1-5]" title="Please type a number 1-5" required=True />
-        <br/>
-  <input type="submit" value="Select">
-</form>
+<head>
+    <title>Admin</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="{% static 'templated-projection/assets/css/main.css' %}" />
+
+
+</head>
+<!-- Banner -->
+			<section id="banner">
+				<div class="inner">
+					<header>
+						<h1>Please Rate New Movies</h1>
+                        <h3>Select movie you want to rate.</h3>
+                        <h3>Type in your ratings(0-5)</h3>
+
+                        <br/>
+                        <br/>
+
+					</header>
+				</div>
+
+
+			</section>
+
+<!-- Three -->
+			<section id="three" class="wrapper align-center">
+				<div class="inner">
+					<div class="flex flex-2">
+                        <br/>
+                        <br/>
+						<article>
+							<header>
+								<h3>New Movies</h3>
+							</header>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <br/>
+                            <form action="" method="post">
+                            {% csrf_token %}
+                            <select name="movie1">
+                            {% for m in movie_list_1  %}
+                                <option value="{{m.movieId}}">{{ m.title  }}</option>
+                            {% endfor %}
+                            </select>
+                                <input type="text" name="rating1" pattern="[1-5]" title="Please type a number 1-5" required=True />
+                                <br/>
+                                <br/>
+                          <input type="submit" value="Select">
+                            </form>
+                            <br/>
+                                    <br/>
+                            </form>
+						</article>
+						<article>
+                            <br/>
+                            <br/>
+                            <right><span class="image fit"><img src="{% static 'templated-projection/images/movie2.jpg'%}" alt="" /></span></right>
+							<br/>
+
+
+						</article>
+					</div>
+				</div>
+			</section>
+
+
+
 </body>
+
+
+
 
 </html>

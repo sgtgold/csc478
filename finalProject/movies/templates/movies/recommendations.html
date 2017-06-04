@@ -1,47 +1,69 @@
+{% load staticfiles %}
 <html>
 <header>
-    <h1>Your Recommendations</h1>
-    <style>
-         a.button {
-            -webkit-appearance: button;
-            -moz-appearance: button;
-            appearance: button;
-            padding: 10px 20px;
-            text-decoration: none;
-            color: initial;
-        }
-        table, th, td {
-        border: 1px solid black;
-        border-collapse: collapse;
-    }
-    th, td {
-        padding: 15px;
-    }
-    </style>
+
+        <title>Recommendation</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="{% static 'templated-projection/assets/css/main.css' %}" />
+
+
 </header>
 {% if movie_list %}
-<table>
-<tr>
-    <th>Rank</th>
-    <th>Title</th>
-    <th>Estimated Rating</th>
-</tr>
-    {% for m in movie_list  %}
-    <tr>
-        <td>{{m.rank}}</td>
-        <td>{{ m.title }}</td>
-        <td>{{m.pred_rating}}</td>
-    </tr>
-    {% endfor %}
 
-    </table>
-    {% else %}
-        <p>No movies are available.</p>
-    {% endif %}
-<h2>Rate a new movie to update your recomendations</h2>
-<form action="" method="post">
-    {% csrf_token %}
-     <input type="submit" value="Select">
-</form>
-<a href="/movies/user.html" class="button">Start as different User</a>
+<body>
+
+    <section id="banner">
+				<div class="inner">
+					<header>
+						<h1>Your Recommendations</h1>
+					</header>
+
+				</div>
+			</section>
+
+        <br/>
+        <br/>
+        <table>
+            <tr>
+        <th>Rank</th>
+        <th>Title</th>
+        <th>Estimated Rating</th>
+        </tr>
+        {% for m in movie_list  %}
+        <tr>
+            <td>{{m.rank}}</td>
+            <td>{{ m.title }}</td>
+            <td>{{m.pred_rating}}</td>
+        </tr>
+        {% endfor %}
+
+        </table>
+        {% else %}
+            <p>No movies are available.</p>
+        {% endif %}
+
+    <footer id="footer">
+				<div class="inner">
+
+					<h3>Rate a new movie to update your recommendations</h3>
+
+
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <input class="button alt" type="submit" value="Rate New Movies">
+                    </form>
+                    <br/>
+                    <br/>
+
+                    <a href="/movies/user.html" class="button alt">Start as different User</a>
+				</div>
+    </footer>
+
+</body>
+
+
+
 </html>

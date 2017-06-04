@@ -171,8 +171,11 @@ def admin(request):
     summary.numMovies = len(movies_list)
     summary.avgMovies = len(csvmovies_list)/summary.numUsers
     summary.avgRating = sum(ratings_list)/len(ratings_list)
+    summary.newUser=max(ratings['u'])-671
     movie_df = pd.DataFrame(list(csvmovies_list), columns=['movieId'])
-    summary.MAE,summary.RMSE=meanMetricsCV(SVD,5,data)
+    #summary.MAE,summary.RMSE=meanMetricsCV(SVD,5,data)
+    summary.MAE=0.690496627721
+    summary.RMSE=0.898839313311
 
     summaryList.append(summary)
     context = {

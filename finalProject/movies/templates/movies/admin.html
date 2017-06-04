@@ -1,18 +1,46 @@
+{% load staticfiles %}
 <html>
 <head>
-<style>
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
-th, td {
-    padding: 15px;
-}
-</style>
-    <h1>Application Performance Monitor</h1>
+
+
+        <title>Admin</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="{% static 'templated-projection/assets/css/main.css' %}" />
+
+
+
+
+
 </head>
 
-  <table>
+<body>
+
+    <section id="banner">
+				<div class="inner">
+					<header>
+						<h1>Model Performance for Movie Guru</h1>
+					</header>
+
+
+
+					<footer>
+                        <br/>
+                        <a href="/movies/" class="button">Home</a>
+                        <br/>
+                        <br/>>
+					</footer>
+				</div>
+			</section>
+    <br/>
+    <br/>
+    <table>
+        <header>
+            <h3>Model Dataset Summary</h3>
+        </header>
+
       <tr>
         <th>Number of Users</th>
         <th>Number of Movies</th>
@@ -26,16 +54,17 @@ th, td {
         <td>{{ summary.numMovies }}</td>
           <td>{{ summary.avgMovies }}</td>
           <td>{{ summary.avgRating }}</td>
-          <td>-1</td>
+          <td>{{ summary.newUser }}</td>
           {% endfor %}
       </tr>
     </table>
   <br/>
   <br/>
 </style>
-    <h1>5-Fold Cross-Validation Results for Mean RMSE and MAE of SVD Model</h1>
+    <h3>5-Fold Cross-Validation Results for Mean RMSE and MAE of SVD Model</h3>
 </head>
     <table>
+
       <tr>
         <th>RMSE</th>
         <th>MAE</th>
@@ -47,8 +76,21 @@ th, td {
           {% endfor %}
       </tr>
     </table>
-    <img src="/movies/charts/histRated.png"/>
-    <img src="/movies/charts/histGenre1.png"/>
-    <img src="/movies/charts/histProd.png"/>
-    <img src="/movies/charts/histYear.png"/>
+    <table>
+    <header>
+            <h3>Feature Distributions</h3>
+        </header>
+    <tr>
+        <td><img src="/movies/charts/histRated.png"/></td>
+        <td><img src="/movies/charts/histGenre1.png"/></td>
+     </tr>
+     <tr>
+        <td><img src="/movies/charts/histProd.png"/></td>
+        <td><img src="/movies/charts/histYear.png"/></td>
+     </tr>
+    </table>
+</body>
+
+
+
 </html>

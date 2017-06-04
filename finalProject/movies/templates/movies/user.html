@@ -1,5 +1,42 @@
+{% load staticfiles %}
+
 <html>
-<h2>Enter in a User Name</h2>
+<head>
+
+
+        <title>Admin</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="{% static 'templated-projection/assets/css/main.css' %}" />
+
+</head>
+
+<body>
+<!-- Banner -->
+			<section id="banner">
+				<div class="inner">
+					<header>
+						<h1>Please Login or Create Username!</h1>
+                        <h3>Existing users will be logged in (if you have rated at least 3 movies)</h3>
+                        <h3>New users will be prompted for some movie ratings.</h3>
+					</header>
+
+                    <div class="field half">
+                        <form action="" method="post">
+                        {% csrf_token %}
+                            {{ form }}
+                        <br/>
+                        <input type="submit" value="OK">
+                        </form>
+                    </div>
+
+
+				</div>
+			</section>
+</body>
+<!--<h2>Enter in a User Name</h2>
 <h2>Existing users will be logged in (if you have rated at least 3 movies)</h2>
 <h2>New users will be prompted for some movie ratings.</h2>
 <h2></h2>
@@ -7,5 +44,24 @@
         {% csrf_token %}
         {{ form }}
         <input type="submit" value="OK">
-    </form>
+    </form>-->
 </html>
+
+<!--<form action="" method="post">
+
+						<div class="field half first">
+							<label for="name">Name</label>
+							<input name="name" id="name" type="text" placeholder="Name">
+						</div>
+						<div class="field half">
+							<label for="email">Email</label>
+							<input name="email" id="email" type="email" placeholder="Email">
+						</div>
+						<div class="field">
+							<label for="message">Message</label>
+							<textarea name="message" id="message" rows="6" placeholder="Message"></textarea>
+						</div>
+						<ul class="actions">
+							<li><input value="Send Message" class="button alt" type="submit"></li>
+						</ul>
+					</form>-->
